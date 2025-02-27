@@ -131,8 +131,8 @@ namespace cg::renderer
 				vertex.x = (vertex.x + 1.f) * width / 2.f;
 				vertex.y = (-vertex.y + 1.f) * height / 2.f;
 			}
-
 		}
+
 		// TODO Lab: 1.05 Add `Rasterization` and `Pixel shader` stages to `draw` method of `cg::renderer::rasterizer`
 		// TODO Lab: 1.06 Add `Depth test` stage to `draw` method of `cg::renderer::rasterizer`
 	}
