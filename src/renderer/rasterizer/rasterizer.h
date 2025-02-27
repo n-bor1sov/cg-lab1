@@ -55,22 +55,38 @@ namespace cg::renderer
 			std::shared_ptr<resource<RT>> in_render_target,
 			std::shared_ptr<resource<float>> in_depth_buffer)
 	{
-		// TODO Lab: 1.02 Implement `set_render_target`, `set_viewport`, `clear_render_target` methods of `cg::renderer::rasterizer` class
-		// TODO Lab: 1.06 Adjust `set_render_target`, and `clear_render_target` methods of `cg::renderer::rasterizer` class to consume a depth buffer
+		if (in_render_target)
+			render_target = in_render_target;
+		if (in_depth_buffer)
+			depth_buffer = in_depth_buffer;
 	}
 
 	template<typename VB, typename RT>
 	inline void rasterizer<VB, RT>::set_viewport(size_t in_width, size_t in_height)
 	{
-		// TODO Lab: 1.02 Implement `set_render_target`, `set_viewport`, `clear_render_target` methods of `cg::renderer::rasterizer` class
+		height = in_height;
+		width = in_width;
 	}
 
 	template<typename VB, typename RT>
 	inline void rasterizer<VB, RT>::clear_render_target(
 			const RT& in_clear_value, const float in_depth)
 	{
-		// TODO Lab: 1.02 Implement `set_render_target`, `set_viewport`, `clear_render_target` methods of `cg::renderer::rasterizer` class
-		// TODO Lab: 1.06 Adjust `set_render_target`, and `clear_render_target` methods of `cg::renderer::rasterizer` class to consume a depth buffer
+		if (render_target)
+		{
+			for (size_t i = 0; i < render_target->count(); i++)
+			{
+				render_target->item(i) = in_clear_value;
+			}
+		}
+
+		if (depth_buffer)
+		{
+			for (size_t i = 0; i < depth_buffer->count(); i++)
+			{
+				depth_buffer->item(i) = in_depth;
+			}
+		}
 	}
 
 	template<typename VB, typename RT>
@@ -90,7 +106,33 @@ namespace cg::renderer
 	template<typename VB, typename RT>
 	inline void rasterizer<VB, RT>::draw(size_t num_vertexes, size_t vertex_offset)
 	{
-		// TODO Lab: 1.04 Implement `cg::world::camera` class
+		size_t vertex_id = vertex_offset;
+		while (vertex_id < vertex_offset + num_vertexes)
+		{
+			std::vector<VB> vertices(3);
+
+			vertices[0] = vertex_buffer->item(
+					index_buffer->item(vertex_id++));
+			vertices[1] = vertex_buffer->item(
+					index_buffer->item(vertex_id++));
+			vertices[2] = vertex_buffer->item(
+					index_buffer->item(vertex_id++));
+
+			for (auto& vertex: vertices)
+			{
+				float4 coords{vertex.x, vertex.y, vertex.z, 1.f};
+
+				auto processed_vertex = vertex_shader(coords, vertex);
+
+				vertex.x = processed_vertex.first.x / processed_vertex.first.w;
+				vertex.y = processed_vertex.first.y / processed_vertex.first.w;
+				vertex.z = processed_vertex.first.z / processed_vertex.first.w;
+
+				vertex.x = (vertex.x + 1.f) * width / 2.f;
+				vertex.y = (-vertex.y + 1.f) * height / 2.f;
+			}
+
+		}
 		// TODO Lab: 1.05 Add `Rasterization` and `Pixel shader` stages to `draw` method of `cg::renderer::rasterizer`
 		// TODO Lab: 1.06 Add `Depth test` stage to `draw` method of `cg::renderer::rasterizer`
 	}
