@@ -104,15 +104,12 @@ namespace cg::renderer
 			vertices[2] = vertex_buffer->item(index_buffer->item(vertex_id++));
 
 			for (auto& vertex: vertices) {
-				float4 coords{vertex.x, vertex.y, vertex.z, 1.f};
+				float4 coords{vertex.position.x, vertex.position.y, vertex.position.z, 1.f};
 				auto processed_vertex = vertex_shader(coords, vertex);
 
-				vertex.x = processed_vertex.first.x / processed_vertex.first.w;
-				vertex.y = processed_vertex.first.y / processed_vertex.first.w;
-				vertex.z = processed_vertex.first.z / processed_vertex.first.w;
-
-				vertex.x = (vertex.x + 1.f) * width / 2.f;
-				vertex.y = (-vertex.y + 1.f) * height / 2.f;
+				vertex.position = processed_vertex.first.xyz() / processed_vertex.first.w;
+				vertex.position.x = (vertex.position.x + 1.f) * width / 2.f;
+				vertex.position.y = (-vertex.position.y + 1.f) * height / 2.f;
 			}
 			// float2 vertex_a = float2{vertices[0].x, vertices[0].y};
 			// float2 vertex_b = float2{vertices[1].x, vertices[1].y};
