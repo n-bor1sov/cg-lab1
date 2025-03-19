@@ -47,7 +47,7 @@ void cg::renderer::rasterization_renderer::render()
 	};
 
 	auto start = std::chrono::high_resolution_clock::now();
-	rasterizer->clear_render_target({121,201,52});
+	rasterizer->clear_render_target({125,189,51});
 	auto stop = std::chrono::high_resolution_clock::now();
 
 	start = std::chrono::high_resolution_clock::now();
