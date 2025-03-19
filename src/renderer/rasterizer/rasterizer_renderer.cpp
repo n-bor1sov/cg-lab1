@@ -50,6 +50,10 @@ void cg::renderer::rasterization_renderer::render()
 		return std::make_pair(processed, data);
 	};
 
+	rasterizer->pixel_shader = [](cg::vertex vertex_data, float z) {
+		return cg::color::from_float3(vertex_data.ambient);
+	};
+
 	auto start = std::chrono::high_resolution_clock::now();
 	rasterizer->clear_render_target({255, 255, 255});
 	auto stop = std::chrono::high_resolution_clock::now();
