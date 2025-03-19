@@ -109,19 +109,19 @@ namespace cg::renderer
 			vertices[2] = vertex_buffer->item(index_buffer->item(vertex_id++));
 
 			for (auto& vertex: vertices) {
-				float4 coords{vertex.position.x, vertex.position.y, vertex.position.z, 1.f};
+				float4 coords{vertex.x, vertex.y, vertex.z, 1.f};
 				auto processed_vertex = vertex_shader(coords, vertex);
 
-				vertex.position.x = processed_vertex.first.x / processed_vertex.first.w;
-				vertex.position.y = processed_vertex.first.y / processed_vertex.first.w;
-				vertex.position.z = processed_vertex.first.z / processed_vertex.first.w;
+				vertex.x = processed_vertex.first.x / processed_vertex.first.w;
+				vertex.y = processed_vertex.first.y / processed_vertex.first.w;
+				vertex.z = processed_vertex.first.z / processed_vertex.first.w;
 
-				vertex.position.x = (vertex.position.x + 1.f) * width / 2.f;
-				vertex.position.y = (-vertex.position.y + 1.f) * height / 2.f;
+				vertex.x = (vertex.x + 1.f) * width / 2.f;
+				vertex.y = (-vertex.y + 1.f) * height / 2.f;
 			}
-			float2 vertex_a = float2{vertices[0].position.x, vertices[0].position.y};
-			float2 vertex_b = float2{vertices[1].position.x, vertices[1].position.y};
-			float2 vertex_c = float2{vertices[2].position.x, vertices[2].position.y};
+			float2 vertex_a = float2{vertices[0].x, vertices[0].y};
+			float2 vertex_b = float2{vertices[1].x, vertices[1].y};
+			float2 vertex_c = float2{vertices[2].x, vertices[2].y};
 
 			float2 min_vertex = min(vertex_a, min(vertex_b, vertex_c));
 			float2 bounding_box_begin = round(clamp(
@@ -149,7 +149,7 @@ namespace cg::renderer
 						float v = edge2 / edge;
 						float w = edge0 / edge;
 
-						float z = u * vertices[0].position.z + v * vertices[1].position.z + w * vertices[2].position.z;
+						float z = u * vertices[0].z + v * vertices[1].z + w * vertices[2].z;
 
 						if (depth_test(z, u_x, u_y)) {
 							auto pixel_result = pixel_shader(vertices[0], 0);
