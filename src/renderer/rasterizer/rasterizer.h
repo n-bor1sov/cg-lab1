@@ -57,7 +57,9 @@ namespace cg::renderer
 	{
 		if (in_render_target)
 			render_target = in_render_target;
-		// TODO Lab: 1.06 Adjust `set_render_target`, and `clear_render_target` methods of `cg::renderer::rasterizer` class to consume a depth buffer
+		if (in_depth_buffer) {
+			depth_buffer = in_depth_buffer;
+		}
 	}
 
 	template<typename VB, typename RT>
@@ -76,7 +78,11 @@ namespace cg::renderer
 				render_target->item(i) = in_clear_value;
 			}
 		}
-		// TODO Lab: 1.06 Adjust `set_render_target`, and `clear_render_target` methods of `cg::renderer::rasterizer` class to consume a depth buffer
+		if (depth_buffer) {
+			for (size_t i = 0; i < depth_buffer->count(); i++) {
+				depth_buffer->item(i) = in_depth;
+			}
+		}
 	}
 
 	template<typename VB, typename RT>
@@ -116,10 +122,6 @@ namespace cg::renderer
 			int2 vertex_c = int2{vertices[2].position.xy()};
 
 			int2 min_vertex = min(vertex_a, min(vertex_b, vertex_c));
-			// int2 begin = round(clamp(
-			// 		min_vertex, float2{0.f, 0.f},
-			// 		float2{static_cast<float>(width - 1), static_cast<float>(height - 1)}));
-
 			int2 max_vertex = max(vertex_a, max(vertex_b, vertex_c));
 			int2 min_viewport = int2{0, 0};
 			int2 max_viewport = int2{int(width)-1, int(height)-1};
@@ -127,7 +129,7 @@ namespace cg::renderer
 			int2 begin = clamp(min_vertex, min_viewport, max_viewport);
 			int2 end = clamp(max_vertex, min_viewport , max_viewport);
 
-			// float edge = edge_function(vertex_a, vertex_b, vertex_c);
+			float edge = static_cast<float>(edge_function(vertex_a, vertex_b, vertex_c));
 
 			for (int x = begin.x; x <= end.x; x++) {
 				for (int y = begin.y; y <= end.y; y++) {
@@ -138,20 +140,18 @@ namespace cg::renderer
 					if (edge0 >= 0 && edge1 >= 0 && edge2 >= 0) {
 						auto pixel_result = pixel_shader(vertices[0], 0);
 						render_target->item(x, y) = RT::from_color(pixel_result);
-						// size_t u_x = static_cast<float>(x);
-						// size_t u_y = static_cast<float>(y);
 
-						// float u = edge1 / edge;
-						// float v = edge2 / edge;
-						// float w = edge0 / edge;
+						float u = static_cast<float>(edge1) / edge;
+						float v = static_cast<float>(edge2) / edge;
+						float w = static_cast<float>(edge0) / edge;
 
-						// float z = u * vertices[0].z + v * vertices[1].z + w * vertices[2].z;
+						float depth = u * vertices[0].position.z + v * vertices[1].position.z + w * vertices[2].position.z;
 
-						// if (depth_test(z, u_x, u_y)) {
-						// 	auto pixel_result = pixel_shader(vertices[0], 0);
-						// 	render_target->item(u_x, u_y) = RT::from_color(pixel_result);
-						// 	depth_buffer->item(u_x, u_y) = z;
-						// }
+						if (depth_test(depth, x, y)) {
+							auto pixel_result = pixel_shader(vertices[0], 0);
+							render_target->item(x, y) = RT::from_color(pixel_result);
+							depth_buffer->item(x, y) = depth;
+						}
 					}
 				}
 			}
