@@ -57,9 +57,8 @@ namespace cg::renderer
 	{
 		if (in_render_target)
 			render_target = in_render_target;
-		if (in_depth_buffer) {
+		if (in_depth_buffer)
 			depth_buffer = in_depth_buffer;
-		}
 	}
 
 	template<typename VB, typename RT>
