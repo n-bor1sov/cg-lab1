@@ -57,7 +57,7 @@ void cg::renderer::rasterization_renderer::render()
 	};
 
 	auto start = std::chrono::high_resolution_clock::now();
-	rasterizer->clear_render_target({255, 255, 255});
+	rasterizer->clear_render_target({0, 34, 123});
 	auto stop = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli> duration = stop - start;
 	std::cout << "CLearing took " << duration.count() << std::endl;
